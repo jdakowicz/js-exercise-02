@@ -13,6 +13,78 @@
             .row .col {
                 padding-right: 10%;
             }
+            h2 {
+                font-size: 16px;
+            }
+            .js-custom-dropdown {
+                position: absolute;
+                width: 0;
+                height: 0;
+                opacity: 0;
+            }
+            .c-custom-select {
+                font-family: 'Myriad Pro', Arial, Helvetica, sans-serif;
+                font-size: 12px;
+                position: relative;
+                width: 278px;
+            }
+            [data-placeholder] {
+                position: relative;
+                cursor: pointer;
+                display: block;
+                height: 40px;
+                line-height: 40px;
+                color: #000;
+                background-color: #f3f3f4;
+                padding-left: 14px;
+                padding-right: 34px;
+            }
+            [data-placeholder]:after {
+                content: '';
+                position: absolute;
+                right: 14px;
+                top: 0;
+                bottom: 4px;
+                width: 10px;
+                height: 10px;
+                border-right: 1px solid #000;
+                border-bottom: 1px solid #000;
+                transform: rotate(45deg);
+                margin: auto;
+            }
+            [data-customselect] {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                display: none;
+            }
+            .c-custom-select.opened [data-customselect] {
+                display: block;
+            }
+            .c-custom-select.opened [data-placeholder]:after {
+                transform: rotate(-135deg);
+                bottom: 0;
+                top: 4px;
+            }
+            [data-customselect] > li {
+                font-family: Arial, sans-serif;
+                color: #000;
+                height: 40px;
+                line-height: 40px;
+                padding-left: 14px;
+                padding-right: 14px;
+                background-color: #f9f9f9;
+            }
+            [data-customselect] > li:hover {
+                background-color: #ff7bcc;
+                color: #fff;
+                cursor: pointer;
+                font-weight: bold;
+            }
         </style>
     </head>
     <body>
@@ -53,8 +125,106 @@
                 dropdown.addEventListener('change', () => {
                     logger.innerHTML = `Dropdown <strong>${index + 1}</strong> has been changed to: <strong>${dropdown.value}</strong>.`
                 })
-            })
+            });
             // end: do not modify
+
+            const css = {
+                wrapper: 'c-custom-select',
+                active: 'active',
+                open: 'opened',
+                temp: `tempClass-${Date.now()}`
+            };
+
+            document.querySelectorAll('.js-custom-dropdown').forEach((customSelect) => {
+                initCustomSelect(customSelect);
+            });
+            document.addEventListener('click', closeSelect);
+
+            function initCustomSelect(element) {
+                prepareHtml(element);
+                addEventHandlers(document.querySelector(`.${css.temp}`));
+                document.querySelector(`.${css.temp}`).classList.remove(css.temp);
+            }
+
+            function prepareHtml(selectItem) {
+                const { items, placeholder } = getOptions(selectItem);
+                appendHTML(selectItem);
+                prepareSelect(placeholder, items);
+            }
+
+            function getOptions(selectItem) {
+                const options = selectItem.options;
+                let items = '';
+                let placeholder = '';
+
+                for(const option of options) {
+                    if (option.attributes.value) {
+                        items += `<li data-value="${option.attributes.value.value}">${option.text}</li>`;
+                    } else if (!placeholder) {
+                        placeholder = option.text;
+                    }
+                }
+
+                return {
+                    items,
+                    placeholder
+                };
+            }
+            function appendHTML(item) {
+                item.parentNode.appendChild(getTemplate(item))
+            }
+
+            function getTemplate(select) {
+                const base = document.createElement('div');
+                base.className = `${css.wrapper} ${css.temp}`;
+                base.innerHTML = `<span data-placeholder></span>
+                                  <ul data-customselect></ul>`;
+                base.appendChild(select);
+
+                return base;
+            }
+
+            function addEventHandlers(element) {
+                addToggleHandler(element);
+                addSelectHandler(element);
+            }
+
+            function prepareSelect(placeholder, options) {
+                document.querySelector(`.${css.temp}`).querySelector('[data-placeholder]').innerText = placeholder;
+                document.querySelector(`.${css.temp}`).querySelector('[data-customselect]').innerHTML = options;
+            }
+
+            function addToggleHandler(el) {
+                el.querySelector('[data-placeholder]').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    el.classList.toggle(css.open);
+                });
+            }
+
+            function addSelectHandler(el) {
+                const fields = el.querySelectorAll('[data-customselect] li');
+                fields.forEach((field) => {
+                    field.addEventListener('click', (e) => {
+                        el.querySelector('[data-placeholder]').innerText = e.target.innerText;
+                        el.classList.remove(css.open);
+
+                        changeSelectValue(el.querySelector('select'), e.target.dataset.value)
+                    });
+                });
+            }
+
+            function changeSelectValue(el, val) {
+                el.value = val;
+                el.dispatchEvent(new Event('change'));
+            }
+
+            function closeSelect () {
+                document.querySelectorAll(`.${css.wrapper}`).forEach((item) => {
+                    item.classList.remove(css.open);
+                });
+            }
+
         </script>
     </body>
 </html>
