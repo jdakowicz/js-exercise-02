@@ -7,6 +7,26 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="robots" content="noindex" />
         <style>
+            :root {
+                --font-main: 'Myriad Pro', Arial, Helvetica, sans-serif;
+                --font-alt: Arial, sans-serif;
+
+                --fz-small: 12px;
+                --fz-normal: 16px;
+
+                --color-hover: #ff7bcc;
+                --color-default: #f9f9f9;
+                --color-active: #f3f3f4;
+                --color-white: #fff;
+                --color-black: #000;
+
+                --size-width: 278px;
+                --size-height: 40px;
+                --size-padd: 14px;
+                --size-arrow: 10px;
+
+                --border: 1px solid #000;
+            }
             .row {
                 display: flex;
             }
@@ -14,7 +34,7 @@
                 padding-right: 10%;
             }
             h2 {
-                font-size: 16px;
+                font-size: var(--fz-normal);
             }
             .js-custom-dropdown {
                 position: absolute;
@@ -23,32 +43,32 @@
                 opacity: 0;
             }
             .c-custom-select {
-                font-family: 'Myriad Pro', Arial, Helvetica, sans-serif;
-                font-size: 12px;
+                font-family: var(--font-main);
+                font-size: var(--fz-small);
                 position: relative;
-                width: 278px;
+                width: var(--size-width);
             }
             [data-placeholder] {
                 position: relative;
                 cursor: pointer;
                 display: block;
-                height: 40px;
-                line-height: 40px;
-                color: #000;
-                background-color: #f3f3f4;
-                padding-left: 14px;
-                padding-right: 34px;
+                height: var(--size-height);
+                line-height: var(--size-height);;
+                color: var(--color--white);;
+                background-color: var(--color-active);
+                padding-left: var(--size-padd);
+                padding-right: calc(var(--size-padd) + 2 * var(--size-arrow));
             }
             [data-placeholder]:after {
                 content: '';
                 position: absolute;
-                right: 14px;
+                right: var(--size-padd);
                 top: 0;
                 bottom: 4px;
-                width: 10px;
-                height: 10px;
-                border-right: 1px solid #000;
-                border-bottom: 1px solid #000;
+                width: var(--size-arrow);
+                height: var(--size-arrow);
+                border-right: var(--border);
+                border-bottom: var(--border);
                 transform: rotate(45deg);
                 margin: auto;
             }
@@ -71,17 +91,17 @@
                 top: 4px;
             }
             [data-customselect] > li {
-                font-family: Arial, sans-serif;
-                color: #000;
-                height: 40px;
-                line-height: 40px;
-                padding-left: 14px;
-                padding-right: 14px;
-                background-color: #f9f9f9;
+                font-family: var(--font-alt);
+                color: var(--color--white);
+                height: var(--size-height);
+                line-height: var(--size-height);
+                padding-left: var(--size-padd);
+                padding-right: var(--size-padd);
+                background-color: var(--color-default);
             }
             [data-customselect] > li:hover {
-                background-color: #ff7bcc;
-                color: #fff;
+                background-color: var(--color-hover);
+                color: var(--color--white);
                 cursor: pointer;
                 font-weight: bold;
             }
@@ -138,7 +158,7 @@
             document.querySelectorAll('.js-custom-dropdown').forEach((customSelect) => {
                 initCustomSelect(customSelect);
             });
-            document.addEventListener('click', closeSelect);
+            document.addEventListener('click', closeSelects);
 
             function initCustomSelect(element) {
                 prepareHtml(element);
@@ -219,7 +239,7 @@
                 el.dispatchEvent(new Event('change'));
             }
 
-            function closeSelect () {
+            function closeSelects () {
                 document.querySelectorAll(`.${css.wrapper}`).forEach((item) => {
                     item.classList.remove(css.open);
                 });
